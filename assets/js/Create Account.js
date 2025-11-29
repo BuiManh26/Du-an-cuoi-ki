@@ -116,6 +116,7 @@ function CheckLengthError(input, min, max) {
   }
 }
 
+/* Kiểm tra mật khẩu khớp */
 function CheckPasswordMatchError(passwordInput, passwordConfirmInput) {
   if (passwordInput.value !== passwordConfirmInput.value) {
     ShowError(passwordConfirmInput, "Mật khẩu không khớp");
@@ -126,6 +127,7 @@ function CheckPasswordMatchError(passwordInput, passwordConfirmInput) {
   }
 }
 
+/* Kiểm tra ký tự đầu là chữ cái */
 function CheckFirstLetter(input) {
   input.value = input.value.trim();
   const firstChar = input.value.charAt(0);
@@ -174,6 +176,42 @@ function CheckPasswordComplexityError(input) {
   }
 }
 
+/* Kiểm tra username đã tồn tại trong localStorage chưa */
+function checkusernameExists(input) {
+  const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
+  const newUsername = input.value.trim();
+  const exists = ds_tk.some(function (acc) {
+    return acc.username && acc.username.toString().trim() === newUsername;
+  });
+
+  if (exists) {
+    // nếu trùng -> hiển thị lỗi và đánh dấu không hợp lệ
+    ShowError(input, "Tên đăng nhập đã tồn tại");
+    checkusername = false;
+  } else {
+    // nếu không trùng -> xóa lỗi liên quan (nếu có)
+    ShowSuccess(input, "Tên đăng nhập đã tồn tại");
+  }
+}
+
+/* Kiểm tra email đã tồn tại trong localStorage chưa */
+function checkEmailExists(input) {
+  const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
+  const newEmail = input.value.trim();
+  const exists = ds_tk.some(function (acc) {
+    return acc.email && acc.email.toString().trim() === newEmail;
+  });
+
+  if (exists) {
+    // nếu trùng -> hiển thị lỗi và đánh dấu không hợp lệ
+    ShowError(input, "Email đã được sử dụng");
+    checkemail = false;
+  } else {
+    // nếu không trùng -> xóa lỗi liên quan (nếu có)
+    ShowSuccess(input, "Email đã được sử dụng");
+  }
+}
+
 /* Sự kiện submit form */
 form.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -181,18 +219,62 @@ form.addEventListener("submit", function (e) {
   let isEmptyErrorEmail = CheckEpmtyError(email);
   let isEmptyErrorPassword = CheckEpmtyError(password);
   let isEmptyErrorPasswordConfirm = CheckEpmtyError(password_confirm);
+  let checkusername = false;
+  let checkemail = false;
+  let checkpassword = false;
+  let checkpasswordconfirm = false;
+
   if (!isEmptyErrorUsername) {
+    CheckLengthError(username, 3, 15);
     CheckFirstLetter(username);
-    CheckLengthError(username, 3, 10);
+    if (
+      !CheckLengthError(username, 3, 15) &&
+      !CheckFirstLetter(username) &&
+      !checkusernameExists(username)
+    ) {
+      checkusername = true;
+    } else {
+      checkusername = false;
+    }
   }
+
   if (!isEmptyErrorEmail) {
-    CheckEmailError(email);
+    if (!CheckEmailError(email) && !checkEmailExists(email)) {
+      checkemail = true;
+    } else {
+      checkemail = false;
+    }
   }
+
   if (!isEmptyErrorPassword) {
-    CheckLengthError(password, 6, 20);
-    CheckPasswordComplexityError(password);
+    if (
+      !CheckLengthError(password, 6, 25) &&
+      !CheckPasswordComplexityError(password)
+    ) {
+      checkpassword = true;
+    } else {
+      checkpassword = false;
+    }
   }
+
   if (!isEmptyErrorPasswordConfirm) {
-    CheckPasswordMatchError(password, password_confirm);
+    if (!CheckPasswordMatchError(password, password_confirm)) {
+      checkpasswordconfirm = true;
+    } else {
+      checkpasswordconfirm = false;
+    }
+  }
+
+  if (checkusername && checkemail && checkpassword && checkpasswordconfirm) {
+    let ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
+    let tk_moi = {
+      username: username.value.trim(),
+      email: email.value.trim(),
+      password: password.value.trim(),
+    };
+    ds_tk.push(tk_moi);
+    localStorage.setItem("ds_tk", JSON.stringify(ds_tk));
+    alert("Tạo tài khoản thành công!");
+    form.reset();
   }
 });
