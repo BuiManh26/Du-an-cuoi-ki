@@ -3,18 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Login</title>
     <!-- reset css -->
     <link rel="stylesheet" href="./assets/css/reset.css" />
 
     <!-- main css -->
     <link rel="stylesheet" href="./assets/css/style.css" />
-
-    <!-- main js -->
-    <script src="./assets/js/main.js"></script>
   </head>
   <body>
-    <p>test</p>
-    <h1>Test</h1>
+    <form id="form-register">
+      <div class="form-control">
+        <label>Tên đăng nhập</label>
+        <input type="text" id="username" placeholder="Nhập tên đăng nhập" />
+        <small class="error"></small>
+      </div>
+      <div class="form-control">
+        <label>Email</label>
+        <input type="text" id="email" placeholder="Nhập email" />
+        <small class="error"></small>
+      </div>
+      <div class="form-control">
+        <label>Mật khẩu</label>
+        <input type="password" id="password" placeholder="Nhập mật khẩu" />
+        <small class="error"></small>
+      </div>
+      <div class="form-control">
+        <label>Xác nhận mật khẩu</label>
+        <input
+          type="password"
+          id="password-confirm"
+          placeholder="Nhập lại mật khẩu"
+        />
+        <small class="error"></small>
+      </div>
+      <button type="submit" id="nop">Đăng ký</button>
+    </form>
   </body>
+  <!-- main js -->
+  <script src="./assets/js/main.js"></script>
 </html>
