@@ -459,7 +459,8 @@ if (form2) {
         ShowError(passwordLogin, "Tên đăng nhập hoặc mật khẩu không đúng");
       } else {
         ShowSuccess(passwordLogin, "Tên đăng nhập hoặc mật khẩu không đúng");
-        alert("Đăng nhập thành công"); // tiếp hành động
+        // chuyển hướng đến trang quản lí
+        window.location.href = "trangquanli.html";
         form2.reset();
       }
     }
