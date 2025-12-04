@@ -230,3 +230,18 @@ loginBtn.addEventListener("click", () => {
   ShowSuccess(passwordLogin, "Tên đăng nhập hoặc mật khẩu không đúng");
   form2.reset();
 });
+
+// Tạo tài khoản admin mặc định nếu chưa có
+const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
+const adminExists = ds_tk.some((tk) => tk.role === "admin");
+if (!adminExists) {
+  const adminAccount = {
+    id: Date.now(),
+    username: "admin",
+    email: "",
+    password: "123963ads!",
+    role: "admin",
+  };
+  ds_tk.push(adminAccount);
+  localStorage.setItem("ds_tk", JSON.stringify(ds_tk));
+}
