@@ -7,10 +7,12 @@ function saveToLocal() {
 
 // Load lại danh sách khi mở trang
 function loadFromLocal() {
-  dataList.forEach(item => renderItem(item));
+  dataList.forEach((item) => renderItem(item));
 }
 window.onload = loadFromLocal;
 function luund() {
+  const tk_dang_nhap = JSON.parse(localStorage.getItem("tk_dang_nhap")) || {};
+  const user = tk_dang_nhap.username;
   const tieude = document.getElementById("tieude").value;
   const chude = document.getElementById("chude").value;
   const mota = document.getElementById("mota").value;
@@ -23,12 +25,13 @@ function luund() {
 
   const newItem = {
     id: Date.now(),
+    username: user,
     tieude,
     chude,
     mota,
     noidung,
     role: document.getElementById("role").value,
-    time: new Date().toLocaleString()
+    time: new Date().toLocaleString(),
   };
 
   dataList.push(newItem);
@@ -51,6 +54,7 @@ function renderItem(item) {
   li.setAttribute("data-id", item.id);
 
   li.innerHTML = `
+    <h4>${item.username}</h4>
     <h5>${item.tieude}</h5>
     <p>${item.noidung}</p>
     <div class="d-flex gap-2 align-items-center">
@@ -65,7 +69,7 @@ function renderItem(item) {
   // XÓA
   li.querySelector(".btn-danger").onclick = function () {
     li.remove();
-    dataList = dataList.filter(x => x.id !== item.id);
+    dataList = dataList.filter((x) => x.id !== item.id);
     saveToLocal();
   };
 
@@ -78,9 +82,17 @@ function renderItem(item) {
 
     // Xóa bản cũ
     li.remove();
-    dataList = dataList.filter(x => x.id !== item.id);
+    dataList = dataList.filter((x) => x.id !== item.id);
     saveToLocal();
   };
 
   dsnoidung.appendChild(li);
 }
+
+const exitBtn = document.getElementById("exit");
+exitBtn.addEventListener("click", function () {
+  // Xóa thông tin tài khoản đang đăng nhập khỏi localStorage
+  localStorage.removeItem("tk_dang_nhap");
+  // Chuyển hướng về trang đăng nhập
+  window.location.href = "index.html";
+});
