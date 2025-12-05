@@ -27,7 +27,7 @@
           <div
             class="col-md-12 d-flex justify-content-md-end gap-3 p-2 justify-content-center"
           >
-            <button class="btn btn-warning">Xem thống kê</button>
+            <button class="btn btn-warning" id="thongke">Xem thống kê</button>
             <button class="btn btn-light border">Chế độ tối</button>
             <button class="btn btn-danger" id="exit">Đăng xuất</button>
           </div>
@@ -132,6 +132,12 @@
         </div>
       </div>
     </section>
+    <script>
+      const tkbtn = document.getElementById("thongke");
+      tkbtn.addEventListener("click", function () {
+        window.location.href = "Admin conten.html";
+      });
+    </script>
     <script src="./assets/js/function.js"></script>
     <script src="./assets/js/Admin.js"></script>
   </body>

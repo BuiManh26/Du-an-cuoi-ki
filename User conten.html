@@ -26,7 +26,7 @@
           <div
             class="col-md-12 d-flex justify-content-md-end gap-3 p-2 justify-content-center"
           >
-            <button class="btn btn-warning">Trang nội dung</button>
+            <button class="btn btn-warning" id="noidung">Trang nội dung</button>
             <button class="btn btn-light border">Chế độ tối</button>
             <button class="btn btn-danger" id="exit">Đăng xuất</button>
           </div>
@@ -77,6 +77,16 @@
         </div>
       </div>
     </section>
+    <script>
+      const ndbtn = document.getElementById("noidung");
+      ndbtn.addEventListener("click", function () {
+        window.location.href = "User.html";
+      });
+      const exitbtn = document.getElementById("exit");
+      exitbtn.addEventListener("click", function () {
+        window.location.href = "index.html";
+      });
+    </script>
     <script src=""></script>
   </body>
 </html>

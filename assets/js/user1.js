@@ -66,6 +66,14 @@ function renderItem(item) {
     <button class="btn btn-sm btn-danger">Xóa</button>
   `;
 
+  // XÓA VÀ SỬA CHỈ HIỂN THỊ NẾU LÀ NGƯỜI TẠO
+  if (
+    item.username !==
+    (JSON.parse(localStorage.getItem("tk_dang_nhap")) || {}).username
+  ) {
+    li.querySelector(".btn-warning").style.display = "none";
+    li.querySelector(".btn-danger").style.display = "none";
+  }
   // XÓA
   li.querySelector(".btn-danger").onclick = function () {
     li.remove();
@@ -84,6 +92,46 @@ function renderItem(item) {
     li.remove();
     dataList = dataList.filter((x) => x.id !== item.id);
     saveToLocal();
+  };
+  //bài đăng ẩn danh
+  if (item.role === "Ẩn danh") {
+    li.querySelector("h4").textContent = "Người dùng ẩn danh";
+  }
+
+  //like
+  const likeBtn = document.createElement("button");
+  likeBtn.className = "btn btn-sm btn-primary";
+  likeBtn.textContent = "Thích";
+  likeBtn.onclick = function () {
+    alert("Bạn đã thích bài đăng này!");
+  };
+  li.appendChild(likeBtn);
+  // đếm like
+  let likeCount = 0;
+  const likeCountDisplay = document.createElement("span");
+  likeCountDisplay.className = "ms-2";
+  likeCountDisplay.textContent = `Lượt thích: ${likeCount}`;
+  li.appendChild(likeCountDisplay);
+
+  likeBtn.onclick = function () {
+    likeCount++;
+    likeCountDisplay.textContent = `Lượt thích: ${likeCount}`;
+  };
+
+  //togle nút like
+  likeBtn.onclick = function () {
+    if (likeBtn.classList.contains("btn-primary")) {
+      likeBtn.classList.remove("btn-primary");
+      likeBtn.classList.add("btn-success");
+      likeBtn.textContent = "Đã thích";
+      likeCount++;
+    } else {
+      likeBtn.classList.remove("btn-success");
+      likeBtn.classList.add("btn-primary");
+      likeBtn.textContent = "Thích";
+      likeCount--;
+    }
+    likeCountDisplay.textContent = `Lượt thích: ${likeCount}`;
   };
 
   dsnoidung.appendChild(li);

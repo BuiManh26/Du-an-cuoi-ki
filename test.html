@@ -17,7 +17,7 @@
     />
 
     <!-- main style -->
-    <link rel="stylesheet" href="./assets/css/style-index.css" />
+    <link rel="stylesheet" href="./assets/css/test.css" />
   </head>
   <body>
     <div class="container h-75 w-75 main rounded-5" id="container">
@@ -105,7 +105,7 @@
       </div>
 
       <!-- form đăng nhập -->
-      <div class="form-container sign-in">
+      <div class="form-container sign-in w-100 w-md-50">
         <form id="form-sign-in">
           <h1>Sign in</h1>
           <div class="social-icon">
@@ -182,11 +182,18 @@
             />
           </div>
           <a href="#" class="question">Forget Your Password?</a>
+          <a
+            href="#"
+            class="question d-md-n d-block"
+            style="margin-top: -10px; margin-bottom: -5px"
+            id="sign-in-iphon"
+            >Sign-up</a
+          >
           <button type="submit" class="button-submit" id="nop">sign-in</button>
         </form>
       </div>
       <!-- thanh chuyển đổi bên -->
-      <div class="toggle-container">
+      <div class="toggle-container d-md-block d-none">
         <div class="toggle">
           <!-- thanh bên trái -->
           <div class="toggle-panel toggle-left">
@@ -203,6 +210,12 @@
         </div>
       </div>
     </div>
+    <script>
+      const signInIphon = document.getElementById("sign-in-iphon");
+      signInIphon.addEventListener("click", () => {
+        window.location.href = "index iphon.html";
+      });
+    </script>
     <script src="./assets/js/index.js"></script>
     <script src="./assets/js/function.js"></script>
   </body>

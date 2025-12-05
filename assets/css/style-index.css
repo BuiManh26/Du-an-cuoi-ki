@@ -16,6 +16,7 @@ body {
   position: relative;
   background-color: #ffffff;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
 }
 
 .main p {
@@ -227,4 +228,11 @@ body {
 
 .main.active .toggle-right {
   transform: translateX(200%);
+}
+
+/* thêm utility 50% từ breakpoint md trở lên */
+@media (min-width: 768px) {
+  .w-md-50 {
+    width: 50% !important;
+  }
 }
