@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./css/Admin.css" />
   </head>
   <body>
-    <header class="main-header bg-light mb-4">
+      <header class="main-header bg-light mb-4">
       <div class="container">
         <div class="row align-items-center">
           <div class="col-md-12 d-flex justify-content-md-end gap-3 p-2 justify-content-center  ">
@@ -30,9 +30,10 @@
           </div>
         </div>
       </div>
-    </header>
+      </header>
     <section>
-      <div class="container">
+      <div style="position:relative; z-index:0;">
+         <div class="container">
         <h1>Trung tâm nội dung</h1>
         <p>Xin chào bạn!</p>
         <div class="row justify-content-between">
@@ -84,9 +85,9 @@
             </div>
           </div>
           <div class="col-md-6 mt-4 mt-md-0">
-            <div class="p-3 border shadow rounded">
+            <div class="p-3 border shadow rounded ">
                 <h3>Danh sách nội dung</h3>
-                <ul id="dsnoidung">
+                <ul id="dsnoidung" >
                 <!-- <div class="p-3 shadow rounded mt-3 border"> 
                     <h4>ten tai khoan</h4>
                     <h5>Tiêu đề nội dung 1</h5>
@@ -105,7 +106,56 @@
           </div>
         </div>
       </div>
+      </div>
+     
     </section>
+    
+     <div class="d-block" >
+      <div class="container-fluid" style="position:absolute; top: 0px;; right: 0; z-index: 1; background-color:rgba(0, 0, 0, 0.563);">
+        <div class="row justify-content-center vh-100 align-items-center p-5">
+          <div class="col-12 bg-white p-4 border shadow w-50 rounded">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5>tk5-nội dung 1</h5>
+              <p style="cursor: pointer">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-x-lg"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                  />
+                </svg>
+              </p>
+            </div>
+            <div class="text-secondary">
+              <small>tk5</small>
+              <small>12/12/2025</small>
+              <small>chủ đề</small>
+            </div>
+            <div>
+              <p>
+                Đây là nội dung bài viết 1. Đây là nội dung bài viết 1. Đây là
+                nội dung bài viết 1. Đây là nội dung bài viết 1. Đây là nội dung
+                bài viết 1. Đây là nội dung bài viết 1. Đây là nội dung bài viết
+                1.
+              </p>
+            </div>
+            <div class="d-flex gap-3 align-items-center p-3 border-top">
+              <button class="btn border">Thích</button>
+              <span>0 lượt thích</span>
+            </div>
+            <div class="border-top pt-3">
+              <h6>Bình luận</h6>
+              <p>Chưa có bình luận</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script>
       const tkbtn= document.getElementById('thongke');
       tkbtn.addEventListener('click', function(){
