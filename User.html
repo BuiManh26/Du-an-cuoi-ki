@@ -72,7 +72,7 @@
                         <label for="role" class="form-label ">Quyền hiển thị</label>
                         <select class="form-select" id="role">
                             <option>Công khai</option>
-                            <option>Ẩn danh</option>
+                            <option>Riêng tư</option>
                         </select>
                     </div>
                     <div>
@@ -110,13 +110,13 @@
      
     </section>
     
-     <div class="d-block" >
+     <div class="d-none" id="popup">
       <div class="container-fluid" style="position:absolute; top: 0px;; right: 0; z-index: 1; background-color:rgba(0, 0, 0, 0.563);">
         <div class="row justify-content-center vh-100 align-items-center p-5">
           <div class="col-12 bg-white p-4 border shadow w-50 rounded">
             <div class="d-flex justify-content-between align-items-center">
               <h5>tk5-nội dung 1</h5>
-              <p style="cursor: pointer">
+              <button style="cursor: pointer" class="btn btn-light border rounded-pill p-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -129,7 +129,7 @@
                     d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
                   />
                 </svg>
-              </p>
+              </button>
             </div>
             <div class="text-secondary">
               <small>tk5</small>
