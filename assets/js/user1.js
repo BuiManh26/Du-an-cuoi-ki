@@ -1,16 +1,4 @@
 let dataList = JSON.parse(localStorage.getItem("noidungList")) || [];
-
-function escapeHtml(s) {
-  if (s === null || s === undefined) return "";
-  return String(s).replace(
-    /[&<>"']/g,
-    (m) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
-        m
-      ])
-  );
-}
-
 // Lưu vào LocalStorage
 function saveToLocal() {
   localStorage.setItem("noidungList", JSON.stringify(dataList));
@@ -20,7 +8,11 @@ function saveToLocal() {
 function loadFromLocal() {
   dataList.forEach((item) => renderItem(item));
 }
+
+// Hàm để tránh XSS
 window.onload = loadFromLocal;
+
+// Hàm lưu nội dung bài đăng
 function luund() {
   const tk_dang_nhap = JSON.parse(localStorage.getItem("tk_dang_nhap")) || {};
   const user = tk_dang_nhap.username;
@@ -57,6 +49,8 @@ function luund() {
 
   alert("Lưu nội dung thành công!");
 }
+
+// hàm hiển thị nội dung bài đăng
 function renderItem(item) {
   const dsnoidung = document.getElementById("dsnoidung");
   const li = document.createElement("div");
@@ -67,10 +61,10 @@ function renderItem(item) {
   li.innerHTML = `
     <h4>${item.username}</h4>
     <h5>${item.tieude}</h5>
-    <p>${item.noidung}</p>
+    <p class="overflow-y-auto " style=" max-height:100px;" >${item.noidung}</p>
     <div class="d-flex gap-2 align-items-center">
       <p class="small">Chủ đề: ${item.chude}</p>
-      <p class="small">${item.time}</p>
+      <p class="small">Mô tả: ${item.mota}</p>
       <p class="btn btn-sm btn-light border rounded-pill px-3">${item.role}</p>
     </div>
     <button class="btn btn-sm btn-warning">Chỉnh sửa</button>
@@ -107,6 +101,21 @@ function renderItem(item) {
   //bài đăng ẩn danh
   if (item.role === "Ẩn danh") {
     li.querySelector("h4").textContent = "Người dùng ẩn danh";
+  }
+
+  //bài đăng private
+  if (item.role === "Private") {
+    li.querySelector("h4").textContent = "Bài đăng riêng tư";
+    li.querySelector("h5").textContent = "Bài đăng riêng tư";
+    li.querySelector("p").textContent = "Nội dung bài đăng này là riêng tư.";
+  }
+  //ẩn bài private nếu không phải người tạo
+  if (
+    item.role === "Private" &&
+    item.username !==
+      (JSON.parse(localStorage.getItem("tk_dang_nhap")) || {}).username
+  ) {
+    li.style.display = "none";
   }
 
   //like
@@ -152,31 +161,28 @@ function renderItem(item) {
   };
 
   //thêm bình luận
-  // ------ BÌNH LUẬN ĐƠN GIẢN NHẤT ------
-
   // Lấy tất cả bình luận từ Local
   let allComments = getComments();
   let commentList = allComments[item.id] || [];
 
   // Vùng hiển thị bình luận
   const commentSection = document.createElement("div");
-  commentSection.className = "mt-2";
+  commentSection.className = "mt-2 overflow-y-auto flex-wrap ";
+  commentSection.style.maxHeight = "200px";
   li.appendChild(commentSection);
-  // Hiển thị bình luận đã lưu (hỗ trợ cả định dạng cũ string và object {user,text})
+
+  // Hiển thị bình luận đã lưu
   commentList.forEach((c) => {
     const p = document.createElement("p");
-    if (typeof c === "string") {
-      p.textContent = c; // cũ: chỉ text
-    } else if (c && typeof c === "object") {
+    if (c && typeof c === "object") {
       p.textContent = `${c.user}: ${c.text}`;
     }
     commentSection.appendChild(p);
   });
 
   // Người bình luận
-  const commenter =
-    (JSON.parse(localStorage.getItem("tk_dang_nhap")) || {}).username ||
-    "Ẩn danh";
+  const commenter = (JSON.parse(localStorage.getItem("tk_dang_nhap")) || {})
+    .username;
 
   // Nút bình luận (hiển thị trong danh sách)
   const commentBtn = document.createElement("button");
@@ -184,20 +190,37 @@ function renderItem(item) {
   commentBtn.textContent = "Bình luận";
   li.appendChild(commentBtn);
 
+  // Xử lý khi nhấn nút bình luận
+  check = false;
   commentBtn.onclick = function () {
+    // tránh tạo nhiều input
+    if (check) {
+      input.remove();
+      send.remove();
+      check = false;
+      return;
+    }
+
+    // tạo input bình luận
     const input = document.createElement("input");
     input.className = "form-control my-2";
     input.placeholder = "Viết bình luận...";
-    commentSection.appendChild(input);
-
+    li.appendChild(input);
+    // tạo nút gửi bình luận
     const send = document.createElement("button");
     send.className = "btn btn-sm btn-primary";
     send.textContent = "Gửi";
-    commentSection.appendChild(send);
+    li.appendChild(send);
+    check = true;
 
+    // Gửi bình luận
     send.onclick = function () {
-      if (input.value.trim() === "") return;
-
+      if (input.value.trim() === "") {
+        input.remove();
+        send.remove();
+        check = false;
+        return;
+      }
       // Hiển thị
       const p = document.createElement("p");
       p.textContent = `${commenter}: ${input.value}`;
@@ -207,7 +230,8 @@ function renderItem(item) {
       commentList.push({ user: commenter, text: input.value });
       allComments[item.id] = commentList;
       saveComments(allComments);
-
+      // Xóa input và nút gửi
+      check = false;
       input.remove();
       send.remove();
     };
@@ -219,8 +243,8 @@ function renderItem(item) {
   detailBtn.textContent = "Xem chi tiết";
   li.appendChild(detailBtn);
 
+  // Xử lý khi nhấn nút xem chi tiết
   detailBtn.onclick = function () {
-    // tạo hoặc tái sử dụng popup riêng để tránh xung đột với popup tĩnh trong HTML
     let popup = document.getElementById("detailPopup");
     if (!popup) {
       popup = document.createElement("div");
@@ -257,15 +281,17 @@ function renderItem(item) {
     if (popupMessage) {
       // Nội dung + khu vực like + comments
       popupMessage.innerHTML = `
-        <h4>${escapeHtml(item.username || "Người dùng")}</h4>
-        <h5>${escapeHtml(item.tieude)}</h5>
-        <p>${escapeHtml(item.noidung)}</p>
+        <h4>${item.username || "Người dùng"}</h4>
+        <h5>${item.tieude}</h5>
+        <p class="overflow-y-auto flex-wrap " style=" max-height:200px;">${
+          item.noidung
+        }</p>
         <div class="d-flex gap-2 align-items-center">
-          <p class="small">Chủ đề: ${escapeHtml(item.chude)}</p>
-          <p class="small">${escapeHtml(item.time)}</p>
-          <p class="btn btn-sm btn-light border rounded-pill px-3">${escapeHtml(
+          <p class="small">Chủ đề: ${item.chude}</p>
+          <p class="small">${item.time}</p>
+          <p class="btn btn-sm btn-light border rounded-pill px-3">${
             item.role
-          )}</p>
+          }</p>
         </div>
         <div class="mt-3">
           <button id="detailLikeBtn" class="btn btn-sm btn-primary">Thích</button>
@@ -274,7 +300,7 @@ function renderItem(item) {
         <hr />
         <div id="detailCommentsSection">
           <h6>Bình luận</h6>
-          <div id="detailCommentsList"></div>
+          <div id="detailCommentsList" class="overflow-y-auto flex-wrap " style=" max-height:200px;" ></div>
           <div class="mt-2 d-flex gap-2">
             <input id="detailCommentInput" class="form-control" placeholder="Viết bình luận..." />
             <button id="detailCommentSend" class="btn btn-sm btn-primary">Gửi</button>
@@ -328,9 +354,7 @@ function renderItem(item) {
         commentsListEl.innerHTML = "";
         comments.forEach((c) => {
           const p = document.createElement("p");
-          if (typeof c === "string") p.textContent = c;
-          else if (c && typeof c === "object")
-            p.textContent = `${c.user}: ${c.text}`;
+          p.textContent = `${c.user}: ${c.text}`;
           commentsListEl.appendChild(p);
         });
       }

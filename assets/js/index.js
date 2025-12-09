@@ -1,5 +1,5 @@
 /* khai báo đăng ký */
-const form = document.getElementById("form-register");
+
 const username = document.getElementById("username");
 const email = document.getElementById("email");
 const password = document.getElementById("password");
@@ -139,6 +139,7 @@ if (form1) {
       localStorage.setItem("ds_tk", JSON.stringify(ds_tk));
       alert("Tạo tài khoản thành công!");
       form1.reset();
+      window.location.href = "index.html";
       container.classList.remove("active");
     }
   });
@@ -194,42 +195,21 @@ if (form2) {
 }
 /* --- End Sửa phần login: CheckLogin trả về boolean, hiển thị lỗi tại submit --- */
 
-/* Làm chuyển động web */
-const container = document.getElementById("container");
-const registerBtn = document.getElementById("register");
-const loginBtn = document.getElementById("login");
+/* --- Chuyển trang khi ấn nút Sign Up / Sign In --- */
+const signUpButton = document.getElementById("login-up");
+const signInButton = document.getElementById("login-in");
 
-/* chuyển sang trang đăng ký */
-registerBtn.addEventListener("click", () => {
-  container.classList.add("active");
-  ShowSuccess(username, [
-    "Không được để trống",
-    "Ký tự đầu phải là chữ cái (A-Z hoặc a-z)",
-    "Tên đăng nhập phải từ 3 đến 15 ký tự",
-    "Tên đăng nhập đã tồn tại",
-  ]);
-  ShowSuccess(email, [
-    "Không được để trống",
-    "Email không hợp lệ",
-    "Email đã được sử dụng",
-  ]);
-  ShowSuccess(password, [
-    "Không được để trống",
-    `Mật khẩu phải từ 6 đến 25 ký tự`,
-    "Mật khẩu phải có ít nhất 1 chữ cái, 1 chữ số và 1 ký tự đặc biệt",
-  ]);
-  ShowSuccess(password_confirm, ["Không được để trống", "Mật khẩu không khớp"]);
-  form1.reset();
-});
+if (signUpButton) {
+  signUpButton.addEventListener("click", () => {
+    window.location.href = "Signup.html";
+  });
+}
 
-/* chuyển sang trang đăng nhập */
-loginBtn.addEventListener("click", () => {
-  container.classList.remove("active");
-  ShowSuccess(usernameLogin, "Không được để trống");
-  ShowSuccess(passwordLogin, "Không được để trống");
-  ShowSuccess(passwordLogin, "Tên đăng nhập hoặc mật khẩu không đúng");
-  form2.reset();
-});
+if (signInButton) {
+  signInButton.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+}
 
 // Tạo tài khoản admin mặc định nếu chưa có
 const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];

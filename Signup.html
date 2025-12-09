@@ -18,9 +18,9 @@
           <div class="w-50">
             <form
               class="d-flex flex-column justify-content-center align-items-center h-100"
-              id="form-sign-in"
+              id="form-sign-up"
             >
-              <h3 class="text-center">Sign-in</h3>
+              <h3 class="text-center">Sign-up</h3>
               <div
                 class="d-flex gap-2 justify-content-center align-items-center"
               >
@@ -84,25 +84,32 @@
               <div
                 class="d-flex flex-column justify-content-center align-items-center w-75"
               >
-                <span>or use your password</span>
+                <span>or use your email for registeration</span>
                 <div class="type-input">
                   <input
                     type="text"
-                    id="username-login"
+                    id="username"
                     placeholder="Nhập tên đăng nhập"
+                  />
+                </div>
+                <div class="type-input">
+                  <input type="text" id="email" placeholder="Nhập email" />
+                </div>
+                <div class="type-input">
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="Nhập mật khẩu"
                   />
                 </div>
                 <div class="type-input">
                   <input
                     type="password"
-                    id="password-login"
-                    placeholder="Nhập mật khẩu"
+                    id="password-confirm"
+                    placeholder="Nhập lại mật khẩu"
                   />
                 </div>
-                <a href="#" class="question">Forget Your Password?</a>
-                <button type="submit" class="button-submit" id="nop">
-                  sign-in
-                </button>
+                <button type="submit" id="nop">Sign-Up</button>
               </div>
             </form>
           </div>
@@ -113,7 +120,7 @@
               >
                 <h1>Welcome Back!</h1>
                 <p>Please login with your personal info</p>
-                <button id="login-up">Sign up</button>
+                <button id="login-in">Sign in</button>
               </div>
             </div>
           </div>
