@@ -1,318 +1,150 @@
-/* in ra lỗi: nếu đã có cùng thông báo thì không tạo thêm */
-function ShowError(input, loi) {
-  if (!input) return;
+// hiển thị lỗi lên màn hình
+function hienthiloi(input, loi) {
   const parent = input.parentElement;
-  const value = (input.value || "").toString().trim();
-  // Xác định thông báo lỗi:
-  // - Nếu input rỗng -> luôn là "Không được để trống"
-  // - Ngược lại lấy từ tham số `loi`, đảm bảo là chuỗi và đã trim
-  let message;
-  if (value === "") {
-    message = "Không được để trống";
-  } else {
-    // nếu `loi` là null/undefined thì dùng chuỗi rỗng, sau đó toString() + trim()
-    message = (loi || "").toString().trim();
-  }
-  if (!message) return;
-  // Nếu input rỗng: xóa tất cả thông báo lỗi hiện có và chỉ thêm 1 thông báo "Không được để trống"
-  if (value === "") {
-    const existingErrors = parent.querySelectorAll(".error");
-    existingErrors.forEach(function (el) {
-      el.remove();
-    });
-    const errEl = document.createElement("small");
-    errEl.className = "error";
-    errEl.innerText = message;
-    parent.appendChild(errEl);
-    return;
-  }
-  // Nếu không rỗng: chỉ thêm thông báo mới nếu chưa tồn tại (không tạo trùng)
-  const errorNodes = parent.querySelectorAll(".error");
-  for (let i = 0; i < errorNodes.length; i++) {
-    const text = (errorNodes[i].innerText || "").trim();
-    if (text === message) {
-      return; // đã có thông báo giống -> không thêm
+  const small = document.createElement("small");
+  small.innerText = loi;
+  small.className = "error";
+  parent.appendChild(small);
+}
+
+// xóa lỗi nhất định
+function xoaloi(input, loi) {
+  const parent = input.parentElement;
+  const small = parent.querySelectorAll("small");
+  for (let i = 0; i < small.length; i++) {
+    if (small[i].innerText === loi) {
+      small[i].remove();
     }
   }
-  const errEl = document.createElement("small");
-  errEl.className = "error";
-  errEl.innerText = message;
-  parent.appendChild(errEl);
 }
 
-/* Hiện thị thành công: xóa các thẻ lỗi có nội dung trùng với 'remove' */
-function ShowSuccess(input, remove) {
-  if (!input || !remove) return;
+//xóa các lỗi trong form
+function xoaloiall(input) {
   const parent = input.parentElement;
-  // Chuẩn hóa `remove` thành mảng các chuỗi đã trim
-  let toRemove;
-  if (Array.isArray(remove)) {
-    // Nếu remove đã là mảng, convert từng phần tử thành chuỗi và trim
-    toRemove = remove.map(function (item) {
-      return (item || "").toString().trim();
-    });
-  } else {
-    // Nếu remove không phải mảng, bọc vào mảng và trim
-    toRemove = [(remove || "").toString().trim()];
+  const small = parent.querySelectorAll("small");
+  for (let i = 0; i < small.length; i++) {
+    small[i].remove();
   }
-
-  const errors = parent.querySelectorAll(".error");
-  errors.forEach((el) => {
-    const text = (el.innerText || "").trim();
-    if (toRemove.includes(text)) {
-      el.remove();
-    }
-  });
 }
 
-/* Kiểm tra trống */
-function CheckEpmtyError(input) {
-  let isEmptyError = false;
+//kt có bỏ trống ko
+function kttrong(input) {
   input.value = input.value.trim();
-  if (!input.value) {
-    isEmptyError = true;
-    ShowError(input, "Không được để trống");
-  } else {
-    ShowSuccess(input, "Không được để trống");
-  }
-  return isEmptyError;
-}
-
-/* Kiểm tra email bằng regex */
-function CheckEmailError(input) {
-  const regexEmail =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  input.value = input.value.trim();
-  if (regexEmail.test(input.value)) {
-    ShowSuccess(input, "Email không hợp lệ");
+  if (input.value === "") {
     return false;
   } else {
-    ShowError(input, "Email không hợp lệ");
     return true;
   }
 }
 
-/* Kiểm tra độ dài ký tự */
-function CheckLengthError(input, min, max) {
+//kt do dai min
+function ktdodaimin(input, min) {
   input.value = input.value.trim();
   if (input.value.length < min) {
-    ShowError(input, `Phải có ít nhất ${min} ký tự`);
-    return true;
-  } else if (input.value.length > max) {
-    ShowError(input, `Không được vượt quá ${max} ký tự`);
-    return true;
-  } else {
-    ShowSuccess(input, [
-      `Phải có ít nhất ${min} ký tự`,
-      `Không được vượt quá ${max} ký tự`,
-    ]);
     return false;
+  } else {
+    return true;
   }
 }
 
-/* Kiểm tra mật khẩu khớp */
-function CheckPasswordMatchError(passwordInput, passwordConfirmInput) {
-  if (passwordInput.value !== passwordConfirmInput.value) {
-    ShowError(passwordConfirmInput, "Mật khẩu không khớp");
-    return true;
-  } else {
-    ShowSuccess(passwordConfirmInput, "Mật khẩu không khớp");
-    return false;
-  }
-}
-
-/* Kiểm tra ký tự đầu là chữ cái */
-function CheckFirstLetter(input) {
+//kt do dai max
+function ktdodaimax(input, max) {
   input.value = input.value.trim();
-  const firstChar = input.value.charAt(0);
-  const code = firstChar.charCodeAt(0);
-  let isLetter = false;
-
-  // Kiểm tra A-Z và a-z bằng if/else (theo mã ASCII)
-  if (code >= 65 && code <= 90) {
-    // A - Z
-    isLetter = true;
-  } else if (code >= 97 && code <= 122) {
-    // a - z
-    isLetter = true;
+  if (input.value.length > max) {
+    return false;
   } else {
-    isLetter = false;
+    return true;
   }
-  if (!isLetter) {
-    ShowError(input, "Ký tự đầu phải là chữ cái (A-Z hoặc a-z)");
+}
+
+//kt email
+function ktemail(input) {
+  input.value = input.value.trim();
+  const regexEmail =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (regexEmail.test(input.value)) {
     return true;
   } else {
-    ShowSuccess(input, "Ký tự đầu phải là chữ cái (A-Z hoặc a-z)");
     return false;
   }
 }
 
-/* Kiểm tra mật khẩu: ít nhất 1 chữ cái, 1 chữ số, 1 ký tự đặc biệt*/
-function CheckPasswordComplexityError(input) {
-  if (!input) return true;
+//kt mat  khau
+function ktmktrung(input1, input2) {
+  input1.value = input1.value.trim();
+  input2.value = input2.value.trim();
+  if (input1.value !== input2.value) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+//kt chữ cái đầu có phải chữ cái ko
+function ktchucaidau(input) {
+  input.value = input.value.trim();
+  const chucai = input.value.charAt(0);
+  const test = /[A-Za-z]/.test(chucai);
+  return test;
+}
+
+//kt điều kiện tối thiểu
+function ktmkmanh(input) {
   input.value = input.value.trim();
   const val = input.value;
-  const hasLetter = /[A-Za-z]/.test(val);
-  const hasDigit = /\d/.test(val);
-  const hasSpecial = /[!@#$%^&*(),.?":{}|<>~`_\-\\\/\[\];'=+;:]/.test(val);
-  if (!hasLetter || !hasDigit || !hasSpecial) {
-    ShowError(
-      input,
-      "Mật khẩu phải có ít nhất 1 chữ cái, 1 chữ số và 1 ký tự đặc biệt"
-    );
+  // dùng regex để kiểm tra
+  const ktchucai = /[A-Za-z]/.test(val);
+  const ktchuso = /\d/.test(val);
+  const ktdacbiet = /[!@#$%^&*(),.?":{}|<>~`_\-\\\/\[\];'=+;:]/.test(val);
+  if (ktchucai && ktchuso && ktdacbiet) {
     return true;
   } else {
-    ShowSuccess(
-      input,
-      "Mật khẩu phải có ít nhất 1 chữ cái, 1 chữ số và 1 ký tự đặc biệt"
-    );
     return false;
   }
 }
 
-/* Kiểm tra username đã tồn tại trong localStorage chưa */
-function checkusernameExists(input) {
+//kt username trùng
+function kt_trung_username(input) {
   const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
   const newUsername = input.value.trim();
-  const exists = ds_tk.some(function (acc) {
-    return acc.username && acc.username.toString().trim() === newUsername;
-  });
-
-  if (exists) {
-    // nếu trùng -> hiển thị lỗi và đánh dấu không hợp lệ
-    ShowError(input, "Tên đăng nhập đã tồn tại");
-    checkusername = false;
-  } else {
-    // nếu không trùng -> xóa lỗi liên quan (nếu có)
-    ShowSuccess(input, "Tên đăng nhập đã tồn tại");
-  }
-}
-
-/* Kiểm tra email đã tồn tại trong localStorage chưa */
-function checkEmailExists(input) {
-  const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
-  const newEmail = input.value.trim();
-  const exists = ds_tk.some(function (acc) {
-    return acc.email && acc.email.toString().trim() === newEmail;
-  });
-
-  if (exists) {
-    // nếu trùng -> hiển thị lỗi và đánh dấu không hợp lệ
-    ShowError(input, "Email đã được sử dụng");
-    checkemail = false;
-  } else {
-    // nếu không trùng -> xóa lỗi liên quan (nếu có)
-    ShowSuccess(input, "Email đã được sử dụng");
-  }
-}
-
-/* --- Validation functions: chỉ trả về boolean (true = hợp lệ) --- */
-
-/* kiểm tra không rỗng */
-function isNotEmpty(input) {
-  if (!input) return false;
-  const v = (input.value || "").toString().trim();
-  return v !== "";
-}
-
-/* kiểm tra định dạng email */
-function isEmailFormat(input) {
-  if (!input) return false;
-  const v = (input.value || "").toString().trim();
-  const re =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(v);
-}
-
-/* kiểm tra độ dài trong khoảng [min, max] */
-function isLengthInRange(input, min, max) {
-  if (!input) return false;
-  const len = (input.value || "").toString().trim().length;
-  return len >= min && len <= max;
-}
-
-/* kiểm tra ký tự đầu là chữ cái A-Z hoặc a-z */
-function isFirstLetterValid(input) {
-  if (!input) return false;
-  const v = (input.value || "").toString().trim();
-  if (!v) return false;
-  const code = v.charCodeAt(0);
-  return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
-}
-
-/* kiểm tra mật khẩu phức tạp: >=6, có chữ, số, ký tự đặc biệt */
-function isPasswordComplex(input) {
-  if (!input) return false;
-  const v = (input.value || "").toString();
-  if (v.length < 6) return false;
-  const hasLetter = /[A-Za-z]/.test(v);
-  const hasDigit = /\d/.test(v);
-  const hasSpecial = /[!@#$%^&*(),.?":{}|<>~`_\-\\\/\[\];'=+;]/.test(v);
-  return hasLetter && hasDigit && hasSpecial;
-}
-
-/* kiểm tra 2 mật khẩu khớp */
-function isPasswordMatch(passInput, confirmInput) {
-  if (!passInput || !confirmInput) return false;
-  return (passInput.value || "") === (confirmInput.value || "");
-}
-
-/* kiểm tra username có sẵn trong localStorage -> true nếu hợp lệ (không trùng) */
-function isUsernameAvailable(input) {
-  if (!input) return false;
-  const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
-  const newUsername = (input.value || "").toString().trim().toLowerCase();
-  if (!newUsername) return false;
-  return !ds_tk.some(function (acc) {
-    return (
-      acc &&
-      acc.username &&
-      acc.username.toString().trim().toLowerCase() === newUsername
-    );
-  });
-}
-
-/* kiểm tra email có sẵn trong localStorage -> true nếu hợp lệ (không trùng) */
-function isEmailAvailable(input) {
-  if (!input) return false;
-  const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
-  const newEmail = (input.value || "").toString().trim().toLowerCase();
-  if (!newEmail) return false;
-  return !ds_tk.some(function (acc) {
-    return (
-      acc && acc.email && acc.email.toString().trim().toLowerCase() === newEmail
-    );
-  });
-}
-
-/* Kiểm tra thông tin đăng nhập */
-function checkLoginCredentials(userInput, passInput) {
-  const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
-  const user = (userInput.value || "").toString().trim();
-  const pass = (passInput.value || "").toString();
+  let check = true;
+  if (newUsername === "") return check;
   for (let i = 0; i < ds_tk.length; i++) {
-    const acc = ds_tk[i];
-    if (!acc) continue;
-    const accUser = (acc.username || "").toString().trim();
-    const accPass = (acc.password || "").toString();
-    if (accUser === user && accPass === pass) {
-      return true;
+    if (ds_tk[i].username === newUsername) {
+      check = false;
+      break;
     }
   }
-  return false;
+  return check;
 }
 
-/* Kiểm tra vai trò người dùng */
-function checkrole(userInput) {
+//kt email trùng
+function kt_trung_email(input) {
   const ds_tk = JSON.parse(localStorage.getItem("ds_tk")) || [];
-  const user = (userInput.value || "").toString().trim();
+  const newUsername = input.value.trim();
+  let check = true;
+  if (newUsername === "") return check;
   for (let i = 0; i < ds_tk.length; i++) {
-    const acc = ds_tk[i];
-    if (!acc) continue;
-    const accUser = (acc.username || "").toString().trim();
-    if (accUser === user) {
-      return acc.role;
+    if (ds_tk[i].email === newUsername) {
+      check = false;
+      break;
     }
   }
-  return null;
+  return check;
+}
+
+//dao danh sach tai khoan dang nhap
+function tk_dang_nhap(input) {
+  const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
+  const username = input.value.trim();
+  for (let i = 0; i < ds_tk.length; i++) {
+    if (username === ds_tk[i].username) {
+      const tk_dang_nhap = {
+        id: ds_tk[i].id,
+        username: username,
+        role: ds_tk[i].role,
+      };
+      localStorage.setItem("tk_dang_nhap", JSON.stringify(tk_dang_nhap));
+    }
+  }
 }

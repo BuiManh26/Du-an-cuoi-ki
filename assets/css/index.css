@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* nền body */
+body {
+  background-color: rgb(255, 190, 250);
+}
+
+/* màu ,size, cung cho các thẻ a */
+a {
+  color: #474747;
+  font-size: 14px;
+  text-decoration: none;
+  margin: 15px 0;
+}
+
+/* các icon */
+.social {
+  margin: 20px 0;
+  display: inline-flex;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  border: 1px solid #dddddd;
+  border-radius: 20%;
+  align-items: center;
+}
+
+.social:hover {
+  color: #ff61e3;
+  border-color: #ff61e3;
+}
+
+/* thẻ span */
+span {
+  font-size: 12px;
+}
+
+/* ô input */
+input {
+  background-color: #f6f5f7;
+  border: none;
+  padding: 12px 15px;
+  margin: 8px 0;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+/* chiều dài cho ô input */
+.type-input {
+  width: 100%;
+}
+
+/* hiểu thị lỗi */
+.type-input .error {
+  color: #fa377f;
+  font-size: 10px;
+  margin-top: 0px;
+  margin-left: 10px;
+  align-self: flex-start;
+}
+
+/* câu hỏi */
+.question:hover {
+  text-decoration: underline;
+  color: #ff61e3;
+}
+
+/* nút bấm */
+button {
+  border-radius: 15px;
+  border: 1px solid #e7e7e7;
+  background-color: #ff8df7;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  zoom: 1.05;
+}
+
+/* phần bên phải */
+.toggle {
+  background-color: #ff8df7;
+  background: linear-gradient(to right, #ff8df7, #ff61e3);
+  color: #ffffff;
+  height: 100%;
+  border-radius: 150px 30px 30px 100px;
+}

@@ -1,67 +1,24 @@
-const form = document.getElementById("addAccountForm");
 const username = document.getElementById("username");
 const email = document.getElementById("email");
 const password = document.getElementById("password");
-const role = document.getElementById("role");
-const table = document.getElementById("accountTableBody");
+const password_confirm = document.getElementById("password-confirm");
+const form1 = document.getElementById("form-sign-up");
 
-function hienthids() {
-  const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
-  const tk_dang_nhap = JSON.parse(localStorage.getItem("tk_dang_nhap") || "[]");
-
-  //xóa toàn bộ nội dung HTML bên trong phần tử
-  table.innerHTML = "";
-
-  for (let i = 0; i < ds_tk.length; i++) {
-    const tk = ds_tk[i];
-
-    const tr = document.createElement("tr");
-    tr.id = tk.id;
-    const username = document.createElement("td");
-    username.textContent = tk.username;
-
-    const date = document.createElement("td");
-    date.textContent = new Date(tk.id).toLocaleString();
-
-    const role = document.createElement("td");
-    role.textContent = tk.role;
-
-    const act = document.createElement("td");
-    const btn = document.createElement("button");
-
-    if (tk.username === tk_dang_nhap.username) {
-      btn.className = "btn btn-primary btn-sm ";
-      btn.textContent = "online";
-    } else {
-      btn.className = "btn btn-danger btn-sm ";
-      btn.textContent = "Xóa";
-    }
-
-    table.appendChild(tr);
-    tr.appendChild(username);
-    tr.appendChild(date);
-    tr.appendChild(role);
-    tr.appendChild(act);
-    act.appendChild(btn);
-  }
-}
-
-// vào trang hiện danh sách
-hienthids();
-
-form.addEventListener("submit", function (e) {
+form1.addEventListener("submit", function (e) {
   e.preventDefault();
-
-  //Xóa các lỗi trong form
-  xoaloiall(username);
-  xoaloiall(email);
-  xoaloiall(password);
 
   let checkusername = false;
   let checkemail = false;
   let checkpassword = false;
+  let checkpasswordconfirm = false;
 
-  // ===== kiểm tra tên đăng nhập =====
+  //xóa lỗi trên màn hình
+  xoaloiall(username);
+  xoaloiall(email);
+  xoaloiall(password);
+  xoaloiall(password_confirm);
+
+  // ===== Kiểm tra tên đang nhập =====
   if (kttrong(username)) {
     checkusername = true;
     xoaloi(username, "Không được để trống");
@@ -152,48 +109,44 @@ form.addEventListener("submit", function (e) {
     hienthiloi(password, "Không được để trống");
   }
 
-  if (checkusername && checkemail && checkpassword) {
+  // ===== Xác thực mật khẩu =====
+  if (kttrong(password_confirm)) {
+    checkpasswordconfirm = true;
+    xoaloi(password_confirm, "Không được để trống");
+
+    if (ktmktrung(password, password_confirm)) {
+      xoaloi(password_confirm, "Mật khẩu không khớp");
+    } else {
+      hienthiloi(password_confirm, "Mật khẩu không khớp");
+      checkpasswordconfirm = false;
+    }
+  } else {
+    checkpasswordconfirm = false;
+    hienthiloi(password_confirm, "Không được để trống");
+  }
+
+  // ===== SUBMIT FORM =====
+  if (checkemail && checkusername && checkpassword && checkpasswordconfirm) {
     const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
     const tk_moi = {
       id: Date.now(),
       username: username.value.trim(),
       email: email.value.trim(),
-      password: password.value.trim(),
-      role: role.value,
+      password: password.value,
+      role: "user",
     };
     ds_tk.push(tk_moi);
     localStorage.setItem("ds_tk", JSON.stringify(ds_tk));
     alert("Tạo tài khoản thành công!");
-    form.reset();
+    form1.reset();
+    window.location.href = "index.html";
   }
-
-  hienthids();
 });
 
-// Xóa tài khoản
-table.addEventListener("click", function (e) {
-  const btn = e.target.parentElement;
-  const bang = btn.parentElement;
-  const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
-  const kiemtra = [];
-  if (btn.textContent === "Xóa") {
-    for (let i = 0; i < ds_tk.length; i++) {
-      if (Number(ds_tk[i].id) !== Number(bang.id)) {
-        if (!confirm("Xóa tài khoản này?")) return;
-        kiemtra.push(ds_tk[i]);
-      }
-    }
-  } else {
-    return;
-  }
-  localStorage.setItem("ds_tk", JSON.stringify(kiemtra));
-  hienthids();
-});
+const signInButton = document.getElementById("login-in");
 
-//thoát về trang đăng nhập
-const exitBtn = document.getElementById("exit");
-exitBtn.addEventListener("click", function () {
-  // Xóa thông tin tài khoản đang đăng nhập khỏi localStorage
-  localStorage.removeItem("tk_dang_nhap");
-  window.location.href = "index.html";
-});
+if (signInButton) {
+  signInButton.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+}
