@@ -1,84 +1,66 @@
-// Thống kê cho trang User
+// lấy dữ liệu đã lưu
+let dsbai = JSON.parse(localStorage.getItem("ds_bai")) || [];
+let dsthich = JSON.parse(localStorage.getItem("ds_thich")) || {};
+let dsbl = JSON.parse(localStorage.getItem("ds_binh_luan")) || {};
+let username = (JSON.parse(localStorage.getItem("tk_dang_nhap")) || {})
+  .username;
 
-// Đọc dữ liệu từ localStorage
-const posts = JSON.parse(localStorage.getItem("noidungList") || "[]");
-const likeCounts = JSON.parse(localStorage.getItem("likeCounts") || "{}");
-const allComments = JSON.parse(localStorage.getItem("allComments") || "{}");
-const current = JSON.parse(localStorage.getItem("tk_dang_nhap") || "{}");
-
-// Người dùng đang đăng nhập
-const username = current.username || null;
-
-// Lọc bài đăng của user hiện tại (nếu không có user -> lấy tất cả)
-const userPosts = username
-  ? posts.filter((p) => p && p.username === username)
-  : posts.filter((p) => p);
-
-// Tính toán thống kê
-const total = userPosts.length;
-
-const publicCount = userPosts.filter(
-  (p) =>
-    p.role &&
-    (p.role.toLowerCase().trim() === "công khai" ||
-      p.role.toLowerCase().trim() === "public")
-).length;
-
-const privateCount = total - publicCount;
-
-// Lượt thích nhận
-let likesReceived = 0;
-userPosts.forEach((p) => {
-  if (p && p.id) {
-    likesReceived += Number(likeCounts[p.id] || 0);
-  }
-});
-
-// Bình luận nhận
-let commentsReceived = 0;
-userPosts.forEach((p) => {
-  if (p && p.id) {
-    const list = allComments[p.id] || [];
-    commentsReceived += Array.isArray(list) ? list.length : 0;
-  }
-});
-
-// Xếp theo chủ đề
-const byTopic = {};
-userPosts.forEach((p) => {
-  if (p) {
-    const topic = (p.chude || "Không có chủ đề").trim();
-    byTopic[topic] = (byTopic[topic] || 0) + 1;
-  }
-});
-
-const topicCount = Object.keys(byTopic).length;
-
-// Hàm cập nhật DOM
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const p = el.querySelector("p");
-  if (p) {
-    p.innerText = value;
-  } else {
-    el.innerText = value;
+// Kiểm tra phiên bản
+if (!username) {
+  alert("Cần đăng nhập để vào trang !");
+  window.location.href = "index.html";
+}
+// tính tổng bài đăng của tôi
+let tongBaiDang = 0;
+for (let bai of dsbai) {
+  if (bai.nguoiDang === username) {
+    tongBaiDang++;
   }
 }
-
-// Cập nhật khi DOM ready
-function applyStats() {
-  setText("tongbaidang", total);
-  setText("baipublic", publicCount);
-  setText("baiprivate", privateCount);
-  setText("luotthich", likesReceived);
-  setText("binhluan", commentsReceived);
-  setText("xepchude", topicCount);
+document.getElementById("tongbaidang").innerText = tongBaiDang;
+// bài public và private
+let baiPublic = 0;
+for (let bai of dsbai) {
+  if (bai.nguoiDang === username && bai.cheDo === "Công khai") {
+    baiPublic++;
+  }
 }
-
-// Chạy khi DOM sẵn sàng
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", applyStats);
-} else {
-  applyStats();
+let baiPrivate = 0;
+for (let bai of dsbai) {
+  if (bai.nguoiDang === username && bai.cheDo === "Private") {
+    baiPrivate++;
+  }
 }
+document.getElementById("baipublic").innerText = baiPublic;
+document.getElementById("baiprivate").innerText = baiPrivate;
+// tính tổng lượt thích nhận được
+let tongLuotThich = 0;
+for (let bai of dsbai) {
+  if (bai.nguoiDang === username) {
+    tongLuotThich += dsthich[bai.id] || 0;
+  }
+}
+document.getElementById("luotthich").innerText = tongLuotThich;
+// tính tổng bình luận nhận được
+let tongBinhLuan = 0;
+for (let bai of dsbai) {
+  if (bai.nguoiDang === username) {
+    tongBinhLuan += dsbl[bai.id] ? dsbl[bai.id].length : 0;
+  }
+}
+document.getElementById("binhluan").innerText = tongBinhLuan;
+// xếp bài đăng theo chủ đề
+let baiTheoChuDe = {};
+for (let bai of dsbai) {
+  if (bai.nguoiDang === username) {
+    if (!baiTheoChuDe[bai.chude]) {
+      baiTheoChuDe[bai.chude] = 0;
+    }
+    baiTheoChuDe[bai.chude]++;
+  }
+}
+let xepChuDeText = "";
+for (let chuDe in baiTheoChuDe) {
+  xepChuDeText += `${chuDe}: ${baiTheoChuDe[chuDe]} bài\n`;
+}
+document.getElementById("xepchude").innerText = xepChuDeText;

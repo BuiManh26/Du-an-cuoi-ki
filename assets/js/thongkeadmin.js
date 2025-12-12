@@ -1,80 +1,54 @@
-// thống kê tổng user (role = "user") trong hệ thống
-const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
-const tongUser = ds_tk.filter(
-  (account) =>
-    account && account.role && 
-    account.role.toLowerCase().trim() === "user"
-).length;
+// lấy các phần tử từ localStorage
+let dsBaiViet = JSON.parse(localStorage.getItem("ds_bai")) || [];
+let dsLuotThich = JSON.parse(localStorage.getItem("ds_thich")) || {};
+let dsBinhLuan = JSON.parse(localStorage.getItem("ds_binh_luan")) || {};
+let users = JSON.parse(localStorage.getItem("ds_tk")) || [];
+let tenNguoiDungHienTai = (
+  JSON.parse(localStorage.getItem("tk_dang_nhap")) || {}
+).username;
+
+// Kiểm tra phiên bản
+if (!tenNguoiDungHienTai) {
+  alert("Cần đăng nhập để vào trang !");
+  window.location.href = "index.html";
+}
+
+// tính tổng số người dùng
+let tongUser = 0;
+for (const user of users) {
+  if (user.role === "user") {
+    tongUser++;
+  }
+}
 document.getElementById("tonguser").innerText = tongUser;
 
-//thống kê tổng bài đăng
-const noidungList = JSON.parse(localStorage.getItem("noidungList")) || [];
-const tongBaiDang = noidungList.length;
-document.getElementById("tongbaidang").innerText = tongBaiDang;
-
-//thống kê bài public
-const baiPublic = noidungList.filter(
-  (item) =>
-    item.role.toLowerCase() === "công khai" ||
-    item.role.toLowerCase() === "public"
-).length;
-document.getElementById("baipublic").innerText = baiPublic;
-
-//thống kê lượt thích
-const likeCounts = JSON.parse(localStorage.getItem("likeCounts")) || {};
-let tongLuotThich = 0;
-noidungList.forEach((item) => {
-  const id = item.id;
-  const count = likeCounts[id] || 0;
-  tongLuotThich += Number(count) || 0;
-});
-document.getElementById("tongluotthich").innerText = tongLuotThich;
-
-//thống kê bình luận
-const allComments = JSON.parse(localStorage.getItem("allComments")) || {};
-let tongBinhLuan = 0;
-noidungList.forEach((item) => {
-  const id = item.id;
-  const comments = allComments[id] || [];
-  tongBinhLuan += comments.length;
-});
-document.getElementById("tongbinhluan").innerText = tongBinhLuan;
-
-//thống kê bài private
-const baiPrivate = tongBaiDang - baiPublic;
-document.getElementById("baiprivate").innerText = baiPrivate;
-
-// Hàm tiện ích để điền text vào phần tử có id
-function setText(id, text) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const p = ensureP(el);
-  if (p) p.innerText = String(text);
-  else el.innerText = String(text);
+// tính tổng số bài viết
+document.getElementById("tongbaidang").innerText = dsBaiViet.length;
+//tổng bài public
+let tongBaiPublic = 0;
+for (let bai of dsBaiViet) {
+  if (bai.cheDo === "Công khai") {
+    tongBaiPublic++;
+  }
 }
-
-// Hàm đảm bảo phần tử có một thẻ <p> con để điền text vào
-function ensureP(el) {
-  if (!el) return null;
-  // tìm p con đầu tiên
-  let p = el.querySelector("p");
-  if (p) return p;
-  // nếu có h5, chèn sau h5, ngược lại append
-  const h5 = el.querySelector("h5");
-  p = document.createElement("p");
-  p.innerText = "";
-  if (h5) h5.insertAdjacentElement("afterend", p);
-  else el.appendChild(p);
-  return p;
+document.getElementById("baipublic").innerText = tongBaiPublic;
+//tổng bài private
+let tongBaiPrivate = 0;
+for (let bai of dsBaiViet) {
+  if (bai.cheDo === "Private") {
+    tongBaiPrivate++;
+  }
 }
-
-// Áp dụng thống kê khi DOM sẵn sàng
-document.addEventListener("DOMContentLoaded", applyStats);
-function applyStats() {
-  setText("tonguser", tongUser);
-  setText("tongbaidang", tongBaiDang);
-  setText("baipublic", baiPublic);
-  setText("baiprivate", baiPrivate);
-  setText("tongluotthich", tongLuotThich);
-  setText("tongbinhluan", tongBinhLuan);
+document.getElementById("baiprivate").innerText = tongBaiPrivate;
+// tính tổng số lượt thích
+let tongLuotThichTatCa = 0;
+for (let bai of dsBaiViet) {
+  tongLuotThichTatCa += dsLuotThich[bai.id] || 0;
 }
+document.getElementById("luotthich").innerText = tongLuotThichTatCa;
+// tính tổng số bình luận
+let tongBinhLuanTatCa = 0;
+for (let bai of dsBaiViet) {
+  tongBinhLuanTatCa += dsBinhLuan[bai.id] ? dsBinhLuan[bai.id].length : 0;
+}
+document.getElementById("binhluan").innerText = tongBinhLuanTatCa;

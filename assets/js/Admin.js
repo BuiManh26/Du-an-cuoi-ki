@@ -9,6 +9,11 @@ function hienthids() {
   const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
   const tk_dang_nhap = JSON.parse(localStorage.getItem("tk_dang_nhap") || "[]");
 
+  if (!tk_dang_nhap.username) {
+    alert("Cần đăng nhập để vào trang !");
+    window.location.href = "index.html";
+  }
+
   //xóa toàn bộ nội dung HTML bên trong phần tử
   table.innerHTML = "";
 
@@ -177,9 +182,9 @@ table.addEventListener("click", function (e) {
   const ds_tk = JSON.parse(localStorage.getItem("ds_tk") || "[]");
   const kiemtra = [];
   if (btn.textContent === "Xóa") {
+    if (!confirm("Xóa tài khoản này?")) return;
     for (let i = 0; i < ds_tk.length; i++) {
       if (Number(ds_tk[i].id) !== Number(bang.id)) {
-        if (!confirm("Xóa tài khoản này?")) return;
         kiemtra.push(ds_tk[i]);
       }
     }

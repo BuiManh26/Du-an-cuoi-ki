@@ -143,10 +143,16 @@ form1.addEventListener("submit", function (e) {
   }
 });
 
-const signInButton = document.getElementById("login-in");
-
-if (signInButton) {
-  signInButton.addEventListener("click", () => {
+// chuyển sang trang đăng kí
+const signInButton1 = document.getElementById("login-in1");
+if (signInButton1) {
+  signInButton1.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+}
+const signInButton2 = document.getElementById("login-in2");
+if (signInButton2) {
+  signInButton2.addEventListener("click", () => {
     window.location.href = "index.html";
   });
 }

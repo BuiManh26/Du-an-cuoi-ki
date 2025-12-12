@@ -71,15 +71,15 @@
                     <div>
                         <label for="role" class="form-label ">Quyền hiển thị</label>
                         <select class="form-select" id="role">
-                            <option>Công khai</option>
-                            <option>Private</option>
+                            <option id="public">Công khai</option>
+                            <option id="private">Private</option>
                         </select>
                     </div>
                     <div>
                         <label for="content" class="form-label mt-3 ">Nội dung chi tiết</label>
                         <textarea class="form-control mb-3" id="noidung" rows="4" placeholder="Nhập nội dung chi tiết"></textarea>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="luund()">
+                    <button type="button" class="btn btn-primary" onclick="themBaiViet()">
                     Lưu nội dung
                     </button>
             </div>
@@ -114,7 +114,7 @@
      
     </section>
     
-     <div class="d-none" id="popup">
+     <!-- <div class="d-none" id="popup">
       <div class="container-fluid" style="position:absolute; top: 0px;; right: 0; z-index: 1; background-color:rgba(0, 0, 0, 0.563);">
         <div class="row justify-content-center vh-100 align-items-center p-5">
           <div class="col-12 bg-white p-4 border shadow w-50 rounded">
@@ -159,13 +159,13 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <script>
       const tkbtn= document.getElementById('thongke');
       tkbtn.addEventListener('click', function(){
         window.location.href='User conten.html';
       });
     </script>
-    <script src="./assets/js/user1.js"></script>
+    <script src="./assets/js/user.js"></script>
   </body>
 </html>

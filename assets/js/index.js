@@ -93,9 +93,15 @@ if (kt) {
 }
 
 /* --- Chuyển trang khi ấn nút Sign Up / Sign In --- */
-const signUpButton = document.getElementById("login-up");
-if (signUpButton) {
-  signUpButton.addEventListener("click", () => {
+const signUpButton1 = document.getElementById("login-up1");
+if (signUpButton1) {
+  signUpButton1.addEventListener("click", () => {
+    window.location.href = "Signup.html";
+  });
+}
+const signUpButton2 = document.getElementById("login-up2");
+if (signUpButton2) {
+  signUpButton2.addEventListener("click", () => {
     window.location.href = "Signup.html";
   });
 }
