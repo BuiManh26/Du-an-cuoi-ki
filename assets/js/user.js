@@ -4,6 +4,10 @@ let danhSachLuotThichTheoBai =
   JSON.parse(localStorage.getItem("ds_thich")) || {};
 let danhSachBinhLuanTheoBai =
   JSON.parse(localStorage.getItem("ds_binh_luan")) || {};
+let dangSuaId = null;
+// Lưu danh sách postId mà mỗi user đã like: { username: [postId,...] }
+let danhSachNguoiThichTheoUser =
+  JSON.parse(localStorage.getItem("user_likes")) || {};
 
 let tenNguoiDungHienTai = (
   JSON.parse(localStorage.getItem("tk_dang_nhap")) || {}
@@ -22,9 +26,33 @@ function luuDanhSachBaiViet() {
 function luuDanhSachLuotThich() {
   localStorage.setItem("ds_thich", JSON.stringify(danhSachLuotThichTheoBai));
 }
+function luuDanhSachNguoiThich() {
+  localStorage.setItem(
+    "user_likes",
+    JSON.stringify(danhSachNguoiThichTheoUser)
+  );
+}
 function luuDanhSachBinhLuan() {
   localStorage.setItem("ds_binh_luan", JSON.stringify(danhSachBinhLuanTheoBai));
 }
+
+function getLikeCount(id) {
+  const v = danhSachLuotThichTheoBai[id];
+  // Nếu nhỡ có mảng (dữ liệu cũ) thì trả về độ dài,
+  // nhưng hệ thống giờ lưu là số nguyên (count).
+  if (Array.isArray(v)) return v.length;
+  if (typeof v === "number") return v;
+  return 0;
+}
+
+// Chuẩn hóa dữ liệu ds_thich nếu trước đó lưu mảng
+for (let id in danhSachLuotThichTheoBai) {
+  if (Array.isArray(danhSachLuotThichTheoBai[id])) {
+    danhSachLuotThichTheoBai[id] = danhSachLuotThichTheoBai[id].length;
+  }
+}
+// Lưu lại nếu có thay đổi
+luuDanhSachLuotThich();
 
 // Hiển thị bài viết khi tải trang
 window.onload = function () {
@@ -45,20 +73,38 @@ function themBaiViet() {
     return;
   }
 
-  let baiVietMoi = {
-    id: Date.now(),
-    nguoiDang: tenNguoiDungHienTai,
-    tieude: tieuDeNhap,
-    chude: chuDeNhap,
-    mota: moTaNhap,
-    noidung: noiDungNhap,
-    cheDo: cheDoNhap,
-    thoiGianTao: new Date().toLocaleString(),
-  };
+  if (dangSuaId) {
+    // Cập nhật bài đã có (giữ nguyên id để bảo toàn like/comment)
+    for (let i = 0; i < danhSachBaiViet.length; i++) {
+      if (danhSachBaiViet[i].id === dangSuaId) {
+        danhSachBaiViet[i].tieude = tieuDeNhap;
+        danhSachBaiViet[i].chude = chuDeNhap;
+        danhSachBaiViet[i].mota = moTaNhap;
+        danhSachBaiViet[i].noidung = noiDungNhap;
+        danhSachBaiViet[i].cheDo = cheDoNhap;
+        // không thay đổi thoiGianTao để giữ lịch sử tạo
+        luuDanhSachBaiViet();
+        hienThiMotBaiViet(danhSachBaiViet[i]);
+        break;
+      }
+    }
+    dangSuaId = null;
+  } else {
+    let baiVietMoi = {
+      id: Date.now(),
+      nguoiDang: tenNguoiDungHienTai,
+      tieude: tieuDeNhap,
+      chude: chuDeNhap,
+      mota: moTaNhap,
+      noidung: noiDungNhap,
+      cheDo: cheDoNhap,
+      thoiGianTao: new Date().toLocaleString(),
+    };
 
-  danhSachBaiViet.push(baiVietMoi);
-  luuDanhSachBaiViet();
-  hienThiMotBaiViet(baiVietMoi);
+    danhSachBaiViet.push(baiVietMoi);
+    luuDanhSachBaiViet();
+    hienThiMotBaiViet(baiVietMoi);
+  }
 
   tieude.value = "";
   chude.value = "";
@@ -90,7 +136,7 @@ function hienThiMotBaiViet(baiViet) {
     "<h5>" +
     (baiViet.cheDo === "Private" ? "Nội dung riêng tư" : baiViet.tieude) +
     "</h5>" +
-    "<p>" +
+    '<p class="overflow-y-auto flex-wrap " style=" max-height:100px;">' +
     (baiViet.cheDo === "Private"
       ? "Không thể xem nội dung."
       : baiViet.noidung) +
@@ -106,23 +152,46 @@ function hienThiMotBaiViet(baiViet) {
     baiViet.cheDo +
     "</span>" +
     "</div>" +
+    '<div class="d-flex align-items-center">' +
     '<button class="btn btn-sm btn-primary mt-2 nut-thich">Thích</button>' +
     '<span class="ms-2 so-luot-thich"></span>' +
     '<button class="btn btn-sm btn-info ms-2 nut-xem">Xem chi tiết</button>' +
-    '<button class="btn btn-sm btn-secondary ms-2 nut-binh-luan">Bình luận</button>';
+    '<button class="btn btn-sm btn-secondary ms-2 nut-binh-luan">Bình luận</button>' +
+    "</div>";
 
-  if (!danhSachLuotThichTheoBai[baiViet.id]) {
-    danhSachLuotThichTheoBai[baiViet.id] = 0;
-  }
+  // Hiển thị số lượt thích hiện có (mặc định 0)
+  var soHienTai = Number(danhSachLuotThichTheoBai[baiViet.id] || 0);
+  var elSo = khung.querySelector(".so-luot-thich");
+  if (elSo) elSo.textContent = soHienTai + " lượt thích";
 
-  khung.querySelector(".so-luot-thich").textContent =
-    danhSachLuotThichTheoBai[baiViet.id] + " lượt thích";
-
+  // Khi người dùng nhấn 'Thích'
   khung.querySelector(".nut-thich").onclick = function () {
-    danhSachLuotThichTheoBai[baiViet.id]++;
-    khung.querySelector(".so-luot-thich").textContent =
-      danhSachLuotThichTheoBai[baiViet.id] + " lượt thích";
+    // Lấy danh sách post đã like của user này
+    if (!Array.isArray(danhSachNguoiThichTheoUser[tenNguoiDungHienTai])) {
+      danhSachNguoiThichTheoUser[tenNguoiDungHienTai] = [];
+    }
+    var likedPosts = danhSachNguoiThichTheoUser[tenNguoiDungHienTai];
+
+    // Nếu user đã like rồi thì không tăng nữa
+    for (var ii = 0; ii < likedPosts.length; ii++) {
+      if (likedPosts[ii] === baiViet.id) {
+        alert("Bạn đã thích bài này rồi");
+        return;
+      }
+    }
+
+    // Tăng số lượt thích (số nguyên) và ghi nhận user đã like bài này
+    var cur = Number(danhSachLuotThichTheoBai[baiViet.id] || 0);
+    cur = cur + 1;
+    danhSachLuotThichTheoBai[baiViet.id] = cur;
+    likedPosts.push(baiViet.id);
+
+    // Lưu cả hai cấu trúc vào localStorage
     luuDanhSachLuotThich();
+    luuDanhSachNguoiThich();
+
+    // Cập nhật hiển thị số lượt thích
+    if (elSo) elSo.textContent = cur + " lượt thích";
   };
 
   khung.querySelector(".nut-binh-luan").onclick = function () {
@@ -135,14 +204,14 @@ function hienThiMotBaiViet(baiViet) {
 
   if (baiViet.nguoiDang === tenNguoiDungHienTai) {
     let nutSua = document.createElement("button");
-    nutSua.className = "btn btn-sm btn-warning mt-2 ms-2";
+    nutSua.className = "btn btn-sm btn-warning mt-2 mb-3 ";
     nutSua.textContent = "Sửa";
     nutSua.onclick = function () {
       suaBaiViet(baiViet, khung);
     };
 
     let nutXoa = document.createElement("button");
-    nutXoa.className = "btn btn-sm btn-danger mt-2 ms-2";
+    nutXoa.className = "btn btn-sm btn-danger mt-2 ms-2 mb-3";
     nutXoa.textContent = "Xóa";
     nutXoa.onclick = function () {
       xoaBaiViet(baiViet, khung);
@@ -158,6 +227,7 @@ function hienThiMotBaiViet(baiViet) {
   let dsCmt = danhSachBinhLuanTheoBai[baiViet.id] || [];
   for (let j = 0; j < dsCmt.length; j++) {
     let dong = document.createElement("p");
+    dong.style = "margin-bottom:5px;";
     dong.textContent = dsCmt[j].user + ": " + dsCmt[j].text;
     khung.appendChild(dong);
   }
@@ -170,15 +240,9 @@ function suaBaiViet(baiViet, khungHTML) {
   mota.value = baiViet.mota;
   noidung.value = baiViet.noidung;
   role.value = baiViet.cheDo;
-  for (let i = 0; i < danhSachBaiViet.length; i++) {
-    if (danhSachBaiViet[i].id === baiViet.id) {
-      danhSachBaiViet.splice(i, 1);
-      break;
-    }
-  }
-
+  // Đánh dấu đang sửa, giữ nguyên id để bảo toàn like + bình luận
+  dangSuaId = baiViet.id;
   khungHTML.remove();
-  luuDanhSachBaiViet();
 }
 
 // Xóa bài viết
@@ -224,6 +288,7 @@ function hienODeNhapBinhLuan(baiViet, khungHTML) {
     luuDanhSachBinhLuan();
 
     let dong = document.createElement("p");
+    dong.style = "margin-bottom:5px;";
     dong.textContent = cmt.user + ": " + cmt.text;
     khungHTML.appendChild(dong);
 
@@ -247,7 +312,7 @@ function moHopXemChiTiet(baiViet) {
     "<h3>" +
     baiViet.tieude +
     "</h3>" +
-    "<p>" +
+    '<p class="overflow-y-auto flex-wrap " style=" max-height:200px;" >' +
     baiViet.noidung +
     "</p>" +
     "<p><b>Chủ đề:</b> " +
@@ -259,7 +324,7 @@ function moHopXemChiTiet(baiViet) {
     '<button class="btn btn-danger mt-2 nut-dong">Đóng</button>' +
     "<hr>" +
     "<h5>Like: " +
-    (danhSachLuotThichTheoBai[baiViet.id] || 0) +
+    getLikeCount(baiViet.id) +
     "</h5>" +
     "<h5>Bình luận</h5>" +
     '<div id="khung-binh-luan"></div>';

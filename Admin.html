@@ -27,6 +27,7 @@
           <div
             class="col-md-12 d-flex justify-content-md-end gap-3 p-2 justify-content-center"
           >
+            <img style="width: 40px" src="./assets/img/logo.png" alt="" />
             <button class="btn btn-warning" id="thongke">Xem thống kê</button>
             <button class="btn btn-light border">Chế độ tối</button>
             <button class="btn btn-danger" id="exit">Đăng xuất</button>
@@ -39,10 +40,10 @@
     <section>
       <div class="container">
         <h1>Trang quản lý</h1>
-        <p>Xin chào,Admin!</p>
+        <p id="xinchao">Xin chào,Admin!</p>
         <div class="row justify-content-between">
           <!-- Bảng thứ nhất tạo tài khoản -->
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="p-3 border shadow rounded">
               <h3>Thêm tài khoản mới</h3>
               <form id="addAccountForm" novalidate>
@@ -88,7 +89,7 @@
             </div>
           </div>
           <!-- Bảng thứ 2 danh sách tài khoản -->
-          <div class="col-md-6 mt-4 mt-md-0">
+          <div class="col-md-8 mt-4 mt-md-0">
             <div class="p-3 border shadow rounded">
               <h3>Danh sách tài khoản</h3>
               <table class="table">
@@ -137,6 +138,11 @@
       tkbtn.addEventListener("click", function () {
         window.location.href = "Admin conten.html";
       });
+
+      const xinchao = document.getElementById("xinchao");
+      const tk_dang_nhap = JSON.parse(localStorage.getItem("tk_dang_nhap"));
+      const tendangnhap = tk_dang_nhap.username;
+      xinchao.textContent = "Xin chào quản trị viên " + tendangnhap + "!";
     </script>
     <script src="./assets/js/function.js"></script>
     <script src="./assets/js/Admin.js"></script>
